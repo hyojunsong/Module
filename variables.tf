@@ -1,8 +1,8 @@
-variable "RG-name" {}
-variable "RG-location" {}
+variable "aRG-name" {}
+variable "aRG-location" {}
 variable "tag" {}
-variable "VN-name" {}
-variable "VN-address" {}
+variable "bVN-name" {}
+variable "bVN-address" {}
 variable "sub-name" {}
 variable "sub-add" {}
 
