@@ -1,17 +1,17 @@
-output "O-RG-name" { 
-  value = var.RG-name 
+output "O-aRG-name" { 
+  value = var.aRG-name 
 }
-output "O-RG-location" { 
-  value = var.RG-location 
+output "O-aRG-location" { 
+  value = var.aRG-location 
 }
 output "O-tag" {
   value = var.tag
 }
-output "O-VN-name" {
-  value = var.VN-name
+output "O-bVN-name" {
+  value = var.bVN-name
 }
-output "O-VN-address" {
-  value = var.VN-address
+output "O-bVN-address" {
+  value = var.bVN-address
 }
 output "O-sub-name" {
   value = var.sub-name
