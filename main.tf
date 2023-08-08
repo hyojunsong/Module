@@ -12,6 +12,7 @@ resource "azurerm_virtual_network" "bVN" {
   count                 = var.coun
   address_space         = [var.bVN-address[count.index]]
   tags                  = var.tag
+  depends_on = [azurerm_resource_group.aRG]
 }
 
 resource "azurerm_subnet" "Subnet" {
@@ -20,6 +21,7 @@ resource "azurerm_subnet" "Subnet" {
   virtual_network_name  = azurerm_virtual_network.bVN[count.index].name
   count                 = var.coun
   address_prefixes      = [var.sub-add[count.index]]
+  depends_on = [azurerm_virtual_network.bVN]
 }
 
 #Public_ip
@@ -47,6 +49,7 @@ resource "azurerm_network_interface" "NIC_Static" {
       public_ip_address_id                  = azurerm_public_ip.Public_ip[count.index].id
     }
     tags                                    = var.tag
+    depends_on = [azurerm_virtual_network.bVN]
 }
 
 #Virtual_Machine
