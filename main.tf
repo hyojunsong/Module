@@ -1,23 +1,23 @@
-resource "azurerm_resource_group" "RG" {
-  name          = var.RG-name[count.index]
-  location      = var.RG-location
+resource "azurerm_resource_group" "aRG" {
+  name          = var.aRG-name[count.index]
+  location      = var.aRG-location
   count         = var.coun
   tags          = var.tag
 }
 
-resource "azurerm_virtual_network" "VN" {
-  name                  = var.VN-name[count.index]
-  resource_group_name   = azurerm_resource_group.RG[count.index].name
-  location              = azurerm_resource_group.RG[count.index].location
+resource "azurerm_virtual_network" "bVN" {
+  name                  = var.bVN-name[count.index]
+  resource_group_name   = azurerm_resource_group.aRG[count.index].name
+  location              = azurerm_resource_group.aRG[count.index].location
   count                 = var.coun
-  address_space         = [var.VN-address[count.index]]
+  address_space         = [var.bVN-address[count.index]]
   tags                  = var.tag
 }
 
 resource "azurerm_subnet" "Subnet" {
   name                  = var.sub-name[count.index]
-  resource_group_name   = azurerm_resource_group.RG[count.index].name
-  virtual_network_name  = azurerm_virtual_network.VN[count.index].name
+  resource_group_name   = azurerm_resource_group.aRG[count.index].name
+  virtual_network_name  = azurerm_virtual_network.bVN[count.index].name
   count                 = var.coun
   address_prefixes      = [var.sub-add[count.index]]
 }
@@ -25,8 +25,8 @@ resource "azurerm_subnet" "Subnet" {
 #Public_ip
 resource "azurerm_public_ip" "Public_ip" {
     name                = var.Public_ip_name[count.index]
-    resource_group_name = azurerm_resource_group.RG[count.index].name
-    location            = azurerm_resource_group.RG[count.index].location
+    resource_group_name = azurerm_resource_group.aRG[count.index].name
+    location            = azurerm_resource_group.aRG[count.index].location
     count               = var.coun
     allocation_method   = "Dynamic"
     tags                = var.tag
@@ -35,8 +35,8 @@ resource "azurerm_public_ip" "Public_ip" {
 #Network_InterFace_Card_Static
 resource "azurerm_network_interface" "NIC_Static" {
     name                  = var.Static_NIC_name[count.index]
-    resource_group_name   = azurerm_resource_group.RG[count.index].name
-    location              = azurerm_resource_group.RG[count.index].location
+    resource_group_name   = azurerm_resource_group.aRG[count.index].name
+    location              = azurerm_resource_group.aRG[count.index].location
     count = var.coun
 
     ip_configuration {
@@ -53,8 +53,8 @@ resource "azurerm_network_interface" "NIC_Static" {
 resource "azurerm_virtual_machine" "VM" {
     name                    = var.vm_name[count.index]
     count = var.coun
-    resource_group_name = azurerm_resource_group.RG[count.index].name
-    location            = azurerm_resource_group.RG[count.index].location
+    resource_group_name = azurerm_resource_group.aRG[count.index].name
+    location            = azurerm_resource_group.aRG[count.index].location
     network_interface_ids   = [ azurerm_network_interface.NIC_Static[count.index].id ]
     vm_size                 = "Standard_D2s_v3"
 
@@ -86,8 +86,8 @@ resource "azurerm_virtual_machine" "VM" {
 
 resource "azurerm_public_ip" "CGD-LB-Public" {
   name                = "CDG_Pu-LB"
-  location            = azurerm_resource_group.RG[count.index].location
-  resource_group_name = azurerm_resource_group.RG[count.index].name
+  location            = azurerm_resource_group.aRG[count.index].location
+  resource_group_name = azurerm_resource_group.aRG[count.index].name
   count = var.coun
   allocation_method   = "Static"
   sku = "Standard"
@@ -97,8 +97,8 @@ resource "azurerm_public_ip" "CGD-LB-Public" {
 
 resource "azurerm_lb" "CGD-LB" {
   name                = var.CGD-LB-name[count.index]
-  location            = azurerm_resource_group.RG[count.index].location
-  resource_group_name = azurerm_resource_group.RG[count.index].name
+  location            = azurerm_resource_group.aRG[count.index].location
+  resource_group_name = azurerm_resource_group.aRG[count.index].name
   count = var.coun
   sku = "Standard"
   frontend_ip_configuration {
@@ -117,7 +117,7 @@ resource "azurerm_lb_backend_address_pool" "CGD-Backend" {
 resource "azurerm_lb_backend_address_pool_address" "add-a" {
   name                    = var.backend-add-name[count.index]
   backend_address_pool_id = azurerm_lb_backend_address_pool.CGD-Backend[count.index].id
-  virtual_network_id      = azurerm_virtual_network.VN[count.index].id
+  virtual_network_id      = azurerm_virtual_network.bVN[count.index].id
   count = var.coun
   ip_address = var.backend-ip-add[count.index]
 }
@@ -144,8 +144,8 @@ resource "azurerm_lb_rule" "CGD-rule" {
 resource "azurerm_network_security_group" "NSG" {
   count = var.coun
   name = var.NSG-name[count.index]
-  location = var.RG-location
-  resource_group_name = var.RG-name[count.index]
+  location = var.aRG-location
+  resource_group_name = var.aRG-name[count.index]
   tags = var.tag
   security_rule {
     name                       = var.security_rule_name[count.index]
