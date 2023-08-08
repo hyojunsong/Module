@@ -105,7 +105,7 @@ resource "azurerm_lb" "CGD-LB" {
     name                 = "CGD_frontend"
     public_ip_address_id = azurerm_public_ip.CGD-LB-Public[count.index].id
   }
-
+}
 ############################################################################
 
 resource "azurerm_lb_backend_address_pool" "CGD-Backend" {
